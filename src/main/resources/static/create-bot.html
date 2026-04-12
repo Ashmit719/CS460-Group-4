@@ -1,0 +1,223 @@
+<!--create-bot.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Bot - BotBuilder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="wizard-page">
+    <header class="wizard-header">
+        <div class="container wizard-header-row">
+            <a href="dashboard.html" class="brand">
+                <div class="brand-icon">🤖</div>
+                <span>BotBuilder</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="container wizard-container">
+        <div class="stepper">
+            <div class="step active"><span>1</span><small>Basic Info</small></div>
+            <div class="step"><span>2</span><small>Knowledge Source</small></div>
+            <div class="step"><span>3</span><small>Customize</small></div>
+            <div class="step"><span>4</span><small>Test</small></div>
+            <div class="step"><span>5</span><small>Deploy</small></div>
+        </div>
+
+        <div class="wizard-card-area">
+			<div id="step-1" class="wizard-step active">
+			    <div class="wizard-card wizard-card-basic">
+			        <h2>Basic Information</h2>
+			        <p>Let's start with the basics about your chatbot.</p>
+
+			        <label for="bot-name">Bot Name *</label>
+			        <input type="text" id="bot-name" placeholder="e.g., Customer Support Bot">
+
+			        <label for="bot-description">Description</label>
+			        <textarea id="bot-description" rows="3" placeholder="Brief description of what this bot does..."></textarea>
+
+			        <label for="bot-language">Language</label>
+			        <select id="bot-language">
+			            <option value="English">English</option>
+			            <option value="Spanish">Spanish</option>
+			            <option value="French">French</option>
+			        </select>
+
+			        <label>Personality Type *</label>
+			        <div class="personality-grid">
+			            <div class="personality-option active" data-value="Professional">
+			                <div class="personality-icon">💼</div>
+			                <div>
+			                    <h4>Professional</h4>
+			                    <p>Formal and business-oriented</p>
+			                </div>
+			            </div>
+
+			            <div class="personality-option" data-value="Friendly">
+			                <div class="personality-icon">😊</div>
+			                <div>
+			                    <h4>Friendly</h4>
+			                    <p>Warm and approachable</p>
+			                </div>
+			            </div>
+
+			            <div class="personality-option" data-value="Sales">
+			                <div class="personality-icon">📈</div>
+			                <div>
+			                    <h4>Sales</h4>
+			                    <p>Persuasive and goal-driven</p>
+			                </div>
+			            </div>
+
+			            <div class="personality-option" data-value="Support">
+			                <div class="personality-icon">🎧</div>
+			                <div>
+			                    <h4>Support</h4>
+			                    <p>Helpful and patient</p>
+			                </div>
+			            </div>
+			        </div>
+
+			        <input type="hidden" id="bot-personality" value="Professional">
+
+			        <div class="wizard-nav-row wizard-nav-step1">
+			            <button class="btn btn-secondary btn-disabled" type="button" disabled>← Previous</button>
+			            <button id="create-bot-btn" class="btn btn-primary" type="button">Next →</button>
+			        </div>
+			    </div>
+			</div>
+
+			<div id="step-2" class="wizard-step">
+			    <div class="wizard-card wizard-card-knowledge">
+			        <h2>Knowledge Source</h2>
+			        <p>Choose where your bot will learn from</p>
+
+			        <label>Source Type *</label>
+
+			        <div class="knowledge-source-grid">
+			            <div class="knowledge-source-option active" data-source="website">
+			                <div class="knowledge-source-icon">🌐</div>
+			                <h4>Import from Website</h4>
+			                <p>Scrape content from your website</p>
+			            </div>
+
+			            <div class="knowledge-source-option" data-source="pdf">
+			                <div class="knowledge-source-icon">📄</div>
+			                <h4>Upload PDF</h4>
+			                <p>Upload PDF documents</p>
+			            </div>
+
+			            <div class="knowledge-source-option" data-source="text">
+			                <div class="knowledge-source-icon">☰</div>
+			                <h4>Paste Text</h4>
+			                <p>Manually paste your content</p>
+			            </div>
+			        </div>
+
+			        <input type="hidden" id="knowledge-source-type" value="website">
+
+			        <div id="knowledge-panel-website" class="knowledge-panel active">
+			            <label for="knowledge-website-url">Website URL *</label>
+			            <div class="knowledge-inline-row">
+			                <input type="url" id="knowledge-website-url" placeholder="https://example.com">
+			            </div>
+			        </div>
+
+			        <div id="knowledge-panel-pdf" class="knowledge-panel">
+			            <label>Upload PDF Files</label>
+			            <div class="upload-dropzone">
+			                <div class="upload-dropzone-icon">📄</div>
+			                <div class="upload-dropzone-title">Click to upload or drag and drop</div>
+			                <div class="upload-dropzone-subtitle">PDF files up to 10MB</div>
+			                <input type="file" id="knowledge-pdf-file" accept=".pdf" hidden>
+			            </div>
+			        </div>
+
+			        <div id="knowledge-panel-text" class="knowledge-panel">
+			            <label for="knowledge-text-content">Paste Your Content *</label>
+			            <textarea id="knowledge-text-content" rows="5" placeholder="Paste your knowledge base content here..."></textarea>
+			            <div id="knowledge-text-counter" class="knowledge-text-counter">0 characters</div>
+			        </div>
+
+			        <div class="wizard-nav-row">
+			            <button id="prev-btn" class="btn btn-secondary" type="button">← Previous</button>
+			            <button id="next-btn" class="btn btn-primary" type="button">Next →</button>
+			        </div>
+			    </div>
+			</div>
+
+            <div id="step-3" class="wizard-step">
+                <div class="wizard-card">
+                    <h2>Customize Behavior</h2>
+                    <p>Fine tune how your bot responds.</p>
+
+                    <label>Tone: <span class="slider-value">Balanced</span></label>
+                    <input type="range" class="slider" min="0" max="100" value="50">
+                    <div class="slider-info">Balanced tone</div>
+
+                    <label>Response Length: <span class="slider-value">Medium</span></label>
+                    <input type="range" class="slider" min="0" max="100" value="50">
+                    <div class="slider-info">Balanced responses</div>
+
+                    <div class="wizard-nav-row">
+                        <button class="btn btn-secondary prev-generic">Previous</button>
+                        <button class="btn btn-primary next-generic">Next</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step-4" class="wizard-step">
+                <div class="wizard-card test-layout">
+                    <div class="test-left">
+                        <h2>Review Your Bot</h2>
+                        <div id="review-info" class="review-box"></div>
+                    </div>
+
+                    <div class="test-right">
+                        <h2>Test Your Bot</h2>
+                        <div class="chat-window">
+                            <div class="chat-messages"></div>
+                            <div class="chat-input">
+                                <input type="text" class="chat-field" placeholder="Type your message...">
+                                <button class="chat-send btn btn-primary">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-bottom-row">
+                    <button class="btn btn-secondary prev-generic">Previous</button>
+                    <button class="btn btn-primary next-generic">Next</button>
+                </div>
+            </div>
+
+            <div id="step-5" class="wizard-step">
+                <div class="wizard-card">
+                    <h2>Deploy Your Bot</h2>
+                    <p>Your bot is ready to deploy.</p>
+
+                    <div class="deploy-box">
+                        <h3>Share Link</h3>
+                        <input type="text" readonly value="http://localhost:8080/chatbot/share/demo-bot">
+                    </div>
+
+                    <div class="deploy-box">
+                        <h3>API Access</h3>
+                        <textarea readonly rows="4">POST /api/bot/chat</textarea>
+                    </div>
+
+                    <div class="wizard-nav-row">
+                        <button class="btn btn-secondary prev-generic">Previous</button>
+                        <a href="dashboard.html" class="btn btn-primary">Finish</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

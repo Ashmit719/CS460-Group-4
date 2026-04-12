@@ -1,0 +1,47 @@
+<!--login.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BotBuilder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+    <div class="auth-shell">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="brand">
+                    <div class="brand-icon">🤖</div>
+                    <span>BotBuilder</span>
+                </div>
+                <h1>Welcome back</h1>
+                <p>Login or create an account to continue</p>
+            </div>
+
+            <div class="auth-grid">
+                <div class="auth-block">
+                    <h2>Login</h2>
+                    <input id="login-email" type="email" placeholder="Email">
+                    <input id="login-password" type="password" placeholder="Password">
+                    <button id="login-btn" class="btn btn-primary btn-full">Login</button>
+                </div>
+
+                <div class="auth-block">
+                    <h2>Sign Up</h2>
+                    <input id="signup-name" type="text" placeholder="Name">
+                    <input id="signup-email" type="email" placeholder="Email">
+                    <input id="signup-password" type="password" placeholder="Password">
+                    <button id="signup-btn" class="btn btn-secondary btn-full">Create Account</button>
+                </div>
+            </div>
+
+            <div class="auth-back">
+                <a href="index.html">← Back to landing page</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>
