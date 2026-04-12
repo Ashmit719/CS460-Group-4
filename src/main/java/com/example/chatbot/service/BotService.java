@@ -46,6 +46,7 @@ public class BotService {
 
     @Value("${openai.api.key}")
     private String openAiApiKey;
+ 
 
     private static final String OPENAI_CHAT_URL = "https://api.openai.com/v1/chat/completions";
     private static final String OPENAI_EMBEDDING_URL = "https://api.openai.com/v1/embeddings";
@@ -53,6 +54,7 @@ public class BotService {
     public BotService(BotRepository botRepository, BotChunkRepository botChunkRepository) {
         this.botRepository = botRepository;
         this.botChunkRepository = botChunkRepository;
+  
     }
 
     @Transactional
@@ -102,6 +104,7 @@ public class BotService {
     }
 
     public String generateResponse(String message, String knowledgeText, Bot bot) {
+    	System.out.println("Loaded API KEY: " + openAiApiKey);
         if (message == null || message.trim().isEmpty()) {
             return "Please enter a valid question.";
         }
