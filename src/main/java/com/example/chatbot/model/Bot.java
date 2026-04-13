@@ -31,14 +31,19 @@ public class Bot {
     @Column(name = "source_type")
     private String sourceType;
 
-    private String status;
+    @Column(nullable = false)
+    private Boolean published = false;
+
+    @Column(name = "public_token", unique = true, length = 100)
+    private String publicToken;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
 
-    public Bot() {}
+    public Bot() {
+    }
 
     public Bot(
             String name,
@@ -49,7 +54,8 @@ public class Bot {
             String tone,
             String responseLength,
             String sourceType,
-            String status,
+            Boolean published,
+            String publicToken,
             User user
     ) {
         this.name = name;
@@ -60,7 +66,8 @@ public class Bot {
         this.tone = tone;
         this.responseLength = responseLength;
         this.sourceType = sourceType;
-        this.status = status;
+        this.published = published;
+        this.publicToken = publicToken;
         this.user = user;
     }
 
@@ -100,8 +107,12 @@ public class Bot {
         return sourceType;
     }
 
-    public String getStatus() {
-        return status;
+    public Boolean getPublished() {
+        return published;
+    }
+
+    public String getPublicToken() {
+        return publicToken;
     }
 
     public User getUser() {
@@ -144,8 +155,12 @@ public class Bot {
         this.sourceType = sourceType;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setPublished(Boolean published) {
+        this.published = published;
+    }
+
+    public void setPublicToken(String publicToken) {
+        this.publicToken = publicToken;
     }
 
     public void setUser(User user) {

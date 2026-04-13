@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - BotBuilder</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <a href="dashboard.html" class="brand">
+                    <div class="brand-icon">🤖</div>
+                    <span>BotBuilder</span>
+                </a>
+
+                <nav class="sidebar-nav">
+                    <a href="dashboard.html" class="sidebar-link" id="my-bots-link">My Bots</a>
+                    <a href="create-bot.html?mode=create" class="sidebar-link" id="create-bot-link">Create New Bot</a>
+                    <a href="analytics.html" class="sidebar-link active" id="analytics-link">Analytics</a>
+                    <a href="settings.html" class="sidebar-link">Settings</a>
+                </nav>
+            </div>
+
+            <div class="sidebar-bottom">
+                <button id="logout-btn" class="sidebar-link logout-btn">Logout</button>
+            </div>
+        </aside>
+
+        <main class="dashboard-main">
+            <div class="dashboard-topbar">
+                <div>
+                    <h1 id="analytics-page-title">Platform Analytics</h1>
+                    <p id="analytics-page-subtitle">Monitor chatbot usage and platform activity</p>
+                </div>
+            </div>
+
+            <div class="analytics-stats-grid">
+                <div class="analytics-stat-card">
+                    <h3>Total Conversations</h3>
+                    <div id="total-conversations" class="analytics-stat-value">0</div>
+                    <p>Across tracked chats</p>
+                </div>
+
+                <div class="analytics-stat-card">
+                    <h3 id="stat-two-label">Total Users</h3>
+                    <div id="stat-two-value" class="analytics-stat-value">0</div>
+                    <p id="stat-two-subtext">Registered users on platform</p>
+                </div>
+
+                <div class="analytics-stat-card">
+                    <h3>Total Bots</h3>
+                    <div id="total-bots" class="analytics-stat-value">0</div>
+                    <p>Bots available in this view</p>
+                </div>
+
+                <div class="analytics-stat-card">
+                    <h3 id="stat-four-label">Total Messages</h3>
+                    <div id="stat-four-value" class="analytics-stat-value">0</div>
+                    <p id="stat-four-subtext">Messages across tracked conversations</p>
+                </div>
+            </div>
+
+            <div class="analytics-chart-card">
+                <div class="analytics-card-header">
+                    <h2 id="chart-title">Conversation Activity</h2>
+                    <p id="chart-subtitle">Daily conversation trend for the last 7 days</p>
+                </div>
+
+                <div class="analytics-real-chart-wrap">
+                    <canvas id="analytics-line-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="analytics-table-card">
+                <div class="analytics-card-header">
+                    <h2 id="activity-title">Recent Activity</h2>
+                    <p id="activity-subtitle">Latest tracked chatbot conversations</p>
+                </div>
+
+                <div class="analytics-table-wrapper">
+                    <table class="analytics-table">
+                        <thead>
+                            <tr>
+                                <th>Bot Name</th>
+                                <th>Source</th>
+                                <th>Chat Type</th>
+                                <th>Last Activity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analytics-activity-body">
+                            <tr>
+                                <td colspan="4">Loading analytics...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="analytics.js"></script>
+</body>
+</html>

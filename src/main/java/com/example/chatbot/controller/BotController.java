@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/bot")
@@ -22,10 +23,8 @@ public class BotController {
         this.userRepository = userRepository;
     }
 
-    // ================= CREATE BOT =================
     @PostMapping("/create")
     public Bot createBot(@RequestBody Map<String, String> payload) {
-
         Long userId = Long.parseLong(payload.get("userId"));
 
         User user = userRepository.findById(userId)
@@ -40,16 +39,16 @@ public class BotController {
         bot.setTone(payload.getOrDefault("tone", "Balanced"));
         bot.setResponseLength(payload.getOrDefault("responseLength", "Medium"));
         bot.setSourceType(payload.getOrDefault("sourceType", "website"));
-        bot.setStatus(payload.getOrDefault("status", "DRAFT"));
+        bot.setPublished(false);
         bot.setUser(user);
 
-        return botService.createBot(bot);
+        String knowledgeText = payload.getOrDefault("knowledgeText", "");
+
+        return botService.createBot(bot, knowledgeText);
     }
 
-    // ================= UPDATE BOT =================
     @PutMapping("/update/{botId}")
     public Bot updateBot(@PathVariable Long botId, @RequestBody Map<String, String> payload) {
-
         Long userId = Long.parseLong(payload.get("userId"));
 
         Bot existingBot = botService.getBot(botId);
@@ -70,18 +69,15 @@ public class BotController {
         existingBot.setTone(payload.getOrDefault("tone", existingBot.getTone()));
         existingBot.setResponseLength(payload.getOrDefault("responseLength", existingBot.getResponseLength()));
         existingBot.setSourceType(payload.getOrDefault("sourceType", existingBot.getSourceType()));
-        existingBot.setStatus(payload.getOrDefault("status", existingBot.getStatus()));
 
         return botService.updateBot(existingBot, payload.getOrDefault("knowledgeText", ""));
     }
 
-    // ================= GET BOTS BY USER =================
     @GetMapping("/user/{userId}")
     public List<Bot> getBotsByUser(@PathVariable Long userId) {
         return botService.getBotsByUser(userId);
     }
 
-    // ================= GET SINGLE BOT =================
     @GetMapping("/{botId}")
     public Bot getBot(@PathVariable Long botId) {
         Bot bot = botService.getBot(botId);
@@ -93,10 +89,57 @@ public class BotController {
         return bot;
     }
 
-    // ================= CHAT =================
+    @PostMapping("/publish/{botId}")
+    public Bot publishBot(@PathVariable Long botId, @RequestParam Long userId) {
+        Bot bot = botService.getBot(botId);
+
+        if (bot == null) {
+            throw new RuntimeException("Bot not found");
+        }
+
+        if (bot.getUser() == null ||
+                !bot.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        if (bot.getPublicToken() == null || bot.getPublicToken().isBlank()) {
+            bot.setPublicToken(UUID.randomUUID().toString());
+        }
+
+        bot.setPublished(true);
+
+        return botService.save(bot);
+    }
+
+    @GetMapping("/public/{token}")
+    public Bot getPublicBot(@PathVariable String token) {
+        Bot bot = botService.getBotByPublicToken(token);
+
+        if (bot == null || !Boolean.TRUE.equals(bot.getPublished())) {
+            throw new RuntimeException("Bot not available");
+        }
+
+        return bot;
+    }
+
+    @PostMapping("/publicChat")
+    public String publicChat(@RequestBody Map<String, String> payload) {
+        String message = payload.get("message");
+        String token = payload.get("token");
+        String sessionId = payload.get("sessionId"); // NEW
+
+        Bot bot = botService.getBotByPublicToken(token);
+
+        if (bot == null || !Boolean.TRUE.equals(bot.getPublished())) {
+            throw new RuntimeException("Bot not available");
+        }
+
+        return botService.generateAndTrackPublicResponse(bot, sessionId, message);
+    }
+
+  
     @PostMapping("/chat")
     public String chat(@RequestBody Map<String, String> payload) {
-
         String message = payload.get("message");
         Long userId = Long.parseLong(payload.get("userId"));
         Long botId = Long.parseLong(payload.get("botId"));
@@ -112,23 +155,23 @@ public class BotController {
             throw new RuntimeException("Bot does not belong to this user");
         }
 
-        return botService.generateResponse(message, "", bot);
+        return botService.generateAndTrackPrivateResponse(bot, message);
     }
-
-    // ================= PREVIEW CHAT =================
+    
     @PostMapping("/previewChat")
     public String previewChat(@RequestBody Map<String, String> payload) {
-
         String message = payload.get("message");
         String knowledgeText = payload.getOrDefault("knowledgeText", "");
         String url = payload.getOrDefault("url", "");
 
         Bot previewBot = new Bot();
         previewBot.setUrl(url);
+        previewBot.setDescription(payload.getOrDefault("description", ""));
         previewBot.setPersonality(payload.getOrDefault("personality", "Professional"));
         previewBot.setLanguage(payload.getOrDefault("language", "English"));
         previewBot.setTone(payload.getOrDefault("tone", "Balanced"));
         previewBot.setResponseLength(payload.getOrDefault("responseLength", "Medium"));
+        previewBot.setSourceType(payload.getOrDefault("sourceType", "website"));
 
         return botService.generateResponse(message, knowledgeText, previewBot);
     }

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Bot</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="public-bot-page">
+
+<header class="public-header">
+    <div class="brand">
+        <div class="brand-icon">🤖</div>
+        <span>BotBuilder</span>
+    </div>
+</header>
+
+<main class="public-container">
+
+    <!-- HERO CARD -->
+    <div class="bot-hero-card">
+        <div class="bot-hero-left">
+            <div class="bot-avatar">🤖</div>
+            <div>
+                <h1 id="bot-name">Loading...</h1>
+                <p id="bot-description">Ask me anything</p>
+            </div>
+        </div>
+
+        <div class="bot-meta">
+            <span id="bot-personality" class="badge">Professional</span>
+            <span id="bot-language" class="badge">English</span>
+        </div>
+    </div>
+
+    <!-- CHAT CARD -->
+    <div class="chat-card">
+        <div id="chat-messages" class="chat-messages"></div>
+
+        <div id="typing-indicator" class="typing-indicator hidden">
+            Bot is typing...
+        </div>
+
+        <div class="chat-input-row">
+            <input id="chat-input" type="text" placeholder="Ask me anything...">
+            <button id="chat-send" class="btn btn-primary">Send</button>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        Powered by BotBuilder
+    </div>
+
+</main>
+
+<script src="public-bot.js"></script>
+</body>
+</html>

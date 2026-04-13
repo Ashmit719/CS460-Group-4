@@ -1,11 +1,6 @@
 package com.example.chatbot.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -15,24 +10,30 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 120)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 160)
     private String email;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(nullable = false, length = 255)
     private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Bot> bots = new ArrayList<>();
+    @Column(nullable = false, length = 6)
+    private String pin;
 
-    public User() {}
+    @Column(nullable = false, length = 20)
+    private String role = "USER";
 
-    public User(String name, String email, String password) {
+    public User() {
+    }
+
+    public User(String name, String email, String password, String pin, String role) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.pin = pin;
+        this.role = role;
     }
 
     public Long getId() {
@@ -51,8 +52,12 @@ public class User {
         return password;
     }
 
-    public List<Bot> getBots() {
-        return bots;
+    public String getPin() {
+        return pin;
+    }
+
+    public String getRole() {
+        return role;
     }
 
     public void setId(Long id) {
@@ -71,7 +76,11 @@ public class User {
         this.password = password;
     }
 
-    public void setBots(List<Bot> bots) {
-        this.bots = bots;
+    public void setPin(String pin) {
+        this.pin = pin;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

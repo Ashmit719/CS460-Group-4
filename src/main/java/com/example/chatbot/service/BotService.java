@@ -2,8 +2,12 @@ package com.example.chatbot.service;
 
 import com.example.chatbot.model.Bot;
 import com.example.chatbot.model.BotChunk;
+import com.example.chatbot.model.Conversation;
+import com.example.chatbot.model.Message;
 import com.example.chatbot.repository.BotChunkRepository;
 import com.example.chatbot.repository.BotRepository;
+import com.example.chatbot.repository.ConversationRepository;
+import com.example.chatbot.repository.MessageRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import okhttp3.MediaType;
@@ -27,12 +31,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,27 +47,34 @@ public class BotService {
 
     private final BotRepository botRepository;
     private final BotChunkRepository botChunkRepository;
+    private final ConversationRepository conversationRepository;
+    private final MessageRepository messageRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Value("${openai.api.key}")
     private String openAiApiKey;
- 
 
     private static final String OPENAI_CHAT_URL = "https://api.openai.com/v1/chat/completions";
     private static final String OPENAI_EMBEDDING_URL = "https://api.openai.com/v1/embeddings";
 
-    public BotService(BotRepository botRepository, BotChunkRepository botChunkRepository) {
+    public BotService(
+            BotRepository botRepository,
+            BotChunkRepository botChunkRepository,
+            ConversationRepository conversationRepository,
+            MessageRepository messageRepository
+    ) {
         this.botRepository = botRepository;
         this.botChunkRepository = botChunkRepository;
-  
+        this.conversationRepository = conversationRepository;
+        this.messageRepository = messageRepository;
     }
 
     @Transactional
-    public Bot createBot(Bot bot) {
+    public Bot createBot(Bot bot, String knowledgeText) {
         Bot savedBot = botRepository.save(bot);
-        ingestBotContent(savedBot, "");
+        ingestBotContent(savedBot, knowledgeText);
         return savedBot;
     }
 
@@ -103,8 +117,18 @@ public class BotService {
         return botRepository.findByUserId(userId);
     }
 
+    public Bot getBotByPublicToken(String token) {
+        return botRepository.findByPublicToken(token).orElse(null);
+    }
+
+    public Bot save(Bot bot) {
+        return botRepository.save(bot);
+    }
+
+    /**
+     * Existing response generator kept for preview mode and compatibility.
+     */
     public String generateResponse(String message, String knowledgeText, Bot bot) {
-    	System.out.println("Loaded API KEY: " + openAiApiKey);
         if (message == null || message.trim().isEmpty()) {
             return "Please enter a valid question.";
         }
@@ -163,6 +187,82 @@ public class BotService {
             e.printStackTrace();
             return "Sorry, something went wrong while processing your question.";
         }
+    }
+
+    /**
+     * Logged-in user/builder chat tracking.
+     */
+    @Transactional
+    public String generateAndTrackPrivateResponse(Bot bot, String message) {
+        String reply = generateResponse(message, "", bot);
+
+        if (bot != null && bot.getId() != null) {
+            String sessionId = "private-bot-" + bot.getId();
+            Conversation conversation = getOrCreateConversation(bot, sessionId, false);
+
+            saveMessage(conversation, "USER", message);
+            saveMessage(conversation, "BOT", reply);
+        }
+
+        return reply;
+    }
+
+    /**
+     * Public visitor chat tracking.
+     */
+    @Transactional
+    public String generateAndTrackPublicResponse(Bot bot, String sessionId, String message) {
+        String effectiveSessionId = (sessionId == null || sessionId.isBlank())
+                ? UUID.randomUUID().toString()
+                : sessionId.trim();
+
+        String reply = generateResponse(message, "", bot);
+
+        if (bot != null && bot.getId() != null) {
+            Conversation conversation = getOrCreateConversation(bot, effectiveSessionId, true);
+
+            saveMessage(conversation, "USER", message);
+            saveMessage(conversation, "BOT", reply);
+        }
+
+        return reply;
+    }
+
+    private Conversation getOrCreateConversation(Bot bot, String sessionId, boolean publicChat) {
+        Optional<Conversation> existing = conversationRepository
+                .findTopByBotIdAndSessionIdAndPublicChatOrderByLastMessageAtDesc(
+                        bot.getId(),
+                        sessionId,
+                        publicChat
+                );
+
+        if (existing.isPresent()) {
+            Conversation conversation = existing.get();
+            conversation.setLastMessageAt(LocalDateTime.now());
+            return conversationRepository.save(conversation);
+        }
+
+        Conversation conversation = new Conversation();
+        conversation.setBot(bot);
+        conversation.setSessionId(sessionId);
+        conversation.setPublicChat(publicChat);
+        conversation.setStartedAt(LocalDateTime.now());
+        conversation.setLastMessageAt(LocalDateTime.now());
+
+        return conversationRepository.save(conversation);
+    }
+
+    private void saveMessage(Conversation conversation, String sender, String content) {
+        Message message = new Message();
+        message.setConversation(conversation);
+        message.setSender(sender);
+        message.setContent(content);
+        message.setCreatedAt(LocalDateTime.now());
+
+        messageRepository.save(message);
+
+        conversation.setLastMessageAt(LocalDateTime.now());
+        conversationRepository.save(conversation);
     }
 
     private void ingestBotContent(Bot bot, String knowledgeText) {
@@ -1034,6 +1134,7 @@ public class BotService {
 
         return vector;
     }
+
     private String normalizeSourceUrl(String url) {
         if (url == null) {
             return null;

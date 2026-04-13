@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - BotBuilder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <a href="dashboard.html" class="brand">
+                    <div class="brand-icon">🤖</div>
+                    <span>BotBuilder</span>
+                </a>
+
+                <nav class="sidebar-nav">
+                    <a href="dashboard.html" class="sidebar-link" id="my-bots-link">My Bots</a>
+                    <a href="create-bot.html?mode=create" class="sidebar-link" id="create-bot-link">Create New Bot</a>
+                    <a href="analytics.html" class="sidebar-link" id="analytics-link">Analytics</a>
+                    <a href="settings.html" class="sidebar-link active">Settings</a>
+                </nav>
+            </div>
+
+            <div class="sidebar-bottom">
+                <button id="logout-btn" class="sidebar-link logout-btn">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <div class="dashboard-topbar">
+                <div>
+                    <h1 id="settings-page-title">Settings</h1>
+                    <p id="settings-page-subtitle">Manage your profile and security</p>
+                </div>
+            </div>
+
+            <div class="settings-grid">
+
+                <!-- Profile Section -->
+                <section class="settings-card">
+                    <h2>Profile</h2>
+
+                    <label for="settings-name">Name</label>
+                    <input id="settings-name" type="text">
+
+                    <label for="settings-email">Email</label>
+                    <input id="settings-email" type="email">
+
+                    <label for="settings-role">Role</label>
+                    <input id="settings-role" type="text" readonly class="readonly-field">
+
+                    <label for="settings-pin">6-digit PIN</label>
+                    <input id="settings-pin" type="text" inputmode="numeric" maxlength="6" placeholder="Enter or update PIN">
+
+                    <div id="profile-message" class="form-message"></div>
+
+                    <button id="save-profile-btn" class="btn btn-primary" type="button">
+                        Save Profile
+                    </button>
+                </section>
+
+                <!-- Change Password -->
+                <section class="settings-card">
+                    <h2>Change Password</h2>
+
+                    <label for="current-password">Current Password</label>
+                    <input id="current-password" type="password">
+
+                    <label for="new-password">New Password</label>
+                    <input id="new-password" type="password">
+
+                    <div id="password-message" class="form-message"></div>
+
+                    <button id="change-password-btn" class="btn btn-primary" type="button">
+                        Change Password
+                    </button>
+                </section>
+
+                <!-- Admin Only Section -->
+                <section class="settings-card admin-only" id="admin-reset-card">
+                    <h2>Admin Reset User Password</h2>
+
+                    <label for="target-email">User Email</label>
+                    <input id="target-email" type="email">
+
+                    <label for="target-pin">User 6-digit PIN</label>
+                    <input id="target-pin" type="text" inputmode="numeric" maxlength="6">
+
+                    <label for="target-new-password">New Password</label>
+                    <input id="target-new-password" type="password">
+
+                    <div id="admin-reset-message" class="form-message"></div>
+
+                    <button id="admin-reset-btn" class="btn btn-secondary" type="button">
+                        Reset User Password
+                    </button>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="settings.js"></script>
+</body>
+</html>
