@@ -31,7 +31,8 @@ function populateUser(user) {
     const nameInput = document.getElementById('settings-name');
     const emailInput = document.getElementById('settings-email');
     const roleInput = document.getElementById('settings-role');
-
+	const pinInput = document.getElementById('settings-pin');
+	
     if (nameInput) {
         nameInput.value = user.name || '';
     }
@@ -43,6 +44,10 @@ function populateUser(user) {
     if (roleInput) {
         roleInput.value = user.role || 'USER';
     }
+	
+	if (pinInput) {
+	        pinInput.value = user.pin || '';
+	}
 
     const adminResetCard = document.getElementById('admin-reset-card');
     const myBotsLink = document.getElementById('my-bots-link');
@@ -113,15 +118,17 @@ async function saveProfile() {
         if (!res.ok) {
             throw new Error(data.message || data.error || 'Failed to update profile.');
         }
+		
+		const mergedUser = {
+		            ...user,
+		            ...data,
+		            pin
+		 };
 
-        saveUser(data);
-        populateUser(data);
+        saveUser(mergedUser);
+        populateUser(mergedUser);
 
-        const pinInput = document.getElementById('settings-pin');
-        if (pinInput) {
-            pinInput.value = '';
-        }
-
+        
         showMessage('profile-message', 'Profile updated successfully.', 'success');
     } catch (err) {
         showMessage('profile-message', err.message || 'Failed to update profile.');

@@ -73,11 +73,17 @@ public class BotService {
 
     @Transactional
     public Bot createBot(Bot bot, String knowledgeText) {
+        if ("text".equalsIgnoreCase(bot.getSourceType())) {
+            bot.setKnowledgeText(knowledgeText);
+        } else {
+            bot.setKnowledgeText(null);
+        }
+
         Bot savedBot = botRepository.save(bot);
         ingestBotContent(savedBot, knowledgeText);
         return savedBot;
     }
-
+    
     @Transactional
     public Bot updateBot(Bot bot, String knowledgeText) {
         Bot existingBot = bot.getId() != null
@@ -86,14 +92,21 @@ public class BotService {
 
         boolean shouldReingest = true;
 
+        if ("text".equalsIgnoreCase(bot.getSourceType())) {
+            bot.setKnowledgeText(knowledgeText);
+        } else {
+            bot.setKnowledgeText(null);
+        }
+
         if (existingBot != null) {
             boolean urlChanged = !safeEquals(existingBot.getUrl(), bot.getUrl());
             boolean sourceTypeChanged = !safeEquals(existingBot.getSourceType(), bot.getSourceType());
-            boolean textSourceUpdated = "text".equalsIgnoreCase(bot.getSourceType())
-                    && knowledgeText != null
-                    && !knowledgeText.isBlank();
+            boolean textChanged = !safeEquals(
+                    existingBot.getKnowledgeText(),
+                    bot.getKnowledgeText()
+            );
 
-            shouldReingest = urlChanged || sourceTypeChanged || textSourceUpdated;
+            shouldReingest = urlChanged || sourceTypeChanged || textChanged;
         }
 
         Bot savedBot = botRepository.save(bot);
@@ -104,7 +117,6 @@ public class BotService {
 
         return savedBot;
     }
-
     public Bot getBot(Long id) {
         return botRepository.findById(id).orElse(null);
     }

@@ -36,6 +36,10 @@ public class Bot {
 
     @Column(name = "public_token", unique = true, length = 100)
     private String publicToken;
+    
+    @Column(name = "knowledge_text", columnDefinition = "TEXT")
+    private String knowledgeText;
+    
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -113,6 +117,14 @@ public class Bot {
 
     public String getPublicToken() {
         return publicToken;
+    }
+    
+    public String getKnowledgeText() {
+        return knowledgeText;
+    }
+
+    public void setKnowledgeText(String knowledgeText) {
+        this.knowledgeText = knowledgeText;
     }
 
     public User getUser() {
