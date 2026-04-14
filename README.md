@@ -1,68 +1,250 @@
-**Chatbot Builder App**
-**Project Overview**
-The Chatbot Builder App is a web application that allows users to easily create, customize, and deploy AI-powered chatbots without needing advanced programming knowledge. The goal of the platform is to provide a simple and intuitive interface where users can build chatbots for websites, customer support, or information services.
-This project is being developed as part of a Software Engineering course project. The application focuses on providing a step-by-step workflow that guides users through creating a chatbot, adding knowledge sources, customizing responses, testing the chatbot, and deploying it to a website.
+# 🤖 Chatbot Builder App
 
-The system also includes analytics features that allow users to track chatbot interactions and performance.
-Features
-The main features of the Chatbot Builder App include:
-- **User Dashboard** to manage multiple chatbots
-- **Chatbot Creation Wizard**** with step-by-step configuration
-- Knowledge Source Integration**
-  - Website URLs
-  - PDF uploads
-  - Manual text input
-- **Chatbot Customization**
-  - Response tone
-  - Response length
-  - Greeting messages
-- **Chatbot Testing Interface** for previewing responses
-- **Deployment Options**
-  - Embed code for websites
-  - Shareable chatbot link
-- **Analytics Dashboard** to monitor chatbot usage and performance
+## 📌 Project Overview
+The Chatbot Builder App is a full-stack web application that allows users to create, customize, test, and deploy AI-powered chatbots without requiring advanced programming knowledge.
 
-## Project Goals
-The main objectives of this project are:
-- Build a user-friendly chatbot creation platform
-- Allow users to generate chatbots without coding
-- Provide simple tools for chatbot customization and testing
-- Enable chatbot deployment to external websites
-- Track chatbot performance through analytics
+The platform provides a guided, step-by-step workflow where users can:
+- Create chatbots
+- Add knowledge sources (URL or text)
+- Customize chatbot behavior
+- Test responses
+- Deploy bots via public links
 
-## System Actors
-The platform supports three main types of users:
-### User
+This project was developed as part of a Software Engineering course and demonstrates end-to-end system design, development, and deployment.
+
+---
+
+## 🚀 Key Features
+
+### 🔹 User Dashboard
+- View and manage all created chatbots
+- Quick access to edit, test, and deploy bots
+
+### 🔹 Chatbot Creation Wizard
+- Step-by-step bot creation flow
+- Supports multiple configurations
+
+### 🔹 Knowledge Source Integration
+- Website URL scraping
+- Manual text input
+- (Future scope: PDF ingestion)
+
+### 🔹 Chatbot Customization
+- Personality (Friendly, Professional, Support)
+- Tone (Formal / Casual / Balanced)
+- Response Length (Short / Medium / Detailed)
+
+### 🔹 Chatbot Testing
+- Built-in chat interface
+- Preview responses before deployment
+
+### 🔹 Deployment
+- Public chatbot link using unique token
+- Shareable chatbot interface for external users
+
+### 🔹 Analytics Dashboard
+- Total conversations
+- Active bots
+- Message statistics
+- Recent activity tracking
+
+---
+
+## 🎯 Project Goals
+
+- Provide a no-code chatbot builder
+- Enable quick deployment of AI assistants
+- Allow custom knowledge ingestion
+- Deliver real-time chatbot responses
+- Provide analytics for performance tracking
+
+---
+
+## 👥 System Actors
+
+### 🧑 User
 - Creates and manages chatbots
-- Uploads knowledge sources
+- Adds knowledge sources
 - Tests chatbot responses
-- Deploys chatbots
-- Views chatbot analytics
-### Admin
+- Deploys bots
+- Views analytics
+
+### 🛠️ Admin
 - Manages platform users
-- Monitors chatbot activity
-- Maintains system performance
-### Website Visitor
-- Interacts with deployed chatbots on external websites
+- Monitors system activity
+- Controls admin-level operations
 
-## System Workflow
-The typical workflow for creating a chatbot includes:
-1. User logs into the platform
-2. User accesses the dashboard
-3. User creates a new chatbot
-4. User adds knowledge sources (URL, PDF, or text)
-5. User customizes chatbot behavior
-6. User tests the chatbot responses
-7. User deploys the chatbot to a website
-8. User monitors chatbot analytics
+### 🌐 Public User (Visitor)
+- Interacts with deployed chatbots via public link
 
-## Technologies (Planned)
-The following technologies may be used during development:
-- **Frontend:** React / Next.js
-- **Backend:** Node.js / Express
-- **Database:** PostgreSQL
-- **AI Integration:** OpenAI API
-- **Design & Prototyping:** Figma
-- **Version Control:** Git & GitHub
+---
 
-## Project Structure (Planned)
+## 🔄 System Workflow
+
+1. User logs into the platform  
+2. User accesses dashboard  
+3. User creates a chatbot  
+4. User adds knowledge (URL / text)  
+5. System ingests and chunks data  
+6. User customizes chatbot behavior  
+7. User tests chatbot responses  
+8. User publishes chatbot  
+9. Public users interact via shareable link  
+10. Analytics track usage  
+
+---
+
+## 🧠 System Architecture
+
+### Logical Flow
+User → Frontend → Backend → Database → OpenAI API
+
+### Components
+- Frontend (HTML/CSS/JavaScript)
+- Backend (Spring Boot)
+- Database (PostgreSQL)
+- AI Integration (OpenAI API)
+
+---
+
+## 🛠️ Technologies Used
+
+### Frontend
+- HTML5
+- CSS3
+- JavaScript (Vanilla JS)
+- Chart.js (Analytics)
+
+### Backend
+- Java 21
+- Spring Boot 3
+- REST APIs
+
+### Database
+- PostgreSQL
+- JPA / Hibernate
+
+### AI Integration
+- OpenAI API (GPT model)
+
+### Tools
+- Eclipse IDE
+- Git & GitHub
+- Postman
+- pgAdmin
+
+---
+
+## 🧩 Database Structure
+
+Main tables:
+- users
+- bot
+- bot_chunk
+- conversation
+- message
+
+---
+
+## 🔀 Git Workflow
+
+The project follows a 3-branch workflow:
+
+- develop → active development  
+- test → testing & validation  
+- main → production-ready code  
+
+### Promotion Flow:
+develop → test → main
+
+---
+
+## ⚙️ Environment Profiles
+
+The application supports multiple environments:
+
+- dev
+- test
+- prod
+
+Configured using:
+- application-dev.properties
+- application-test.properties
+- application-prod.properties
+
+---
+
+## ▶️ Running the Application (Demo)
+
+### Option 1 — Using Batch File (Recommended)
+
+Run:
+start-botbuilder.bat
+
+✔ Starts application in PROD mode  
+✔ Automatically opens browser  
+
+---
+
+### Option 2 — Using Eclipse
+
+Run:
+ChatbotBuilderApplication.java
+
+---
+
+## 🌍 Access Application
+
+http://localhost:8080/
+
+---
+
+## ⚠️ Prerequisites
+
+- Java 21+
+- PostgreSQL running
+- OpenAI API Key
+
+Set API key:
+OPENAI_API_KEY=your_key_here
+
+---
+
+## 🧪 Testing
+
+- Functional testing performed
+- Chatbot response validation
+- API testing using Postman
+- Analytics verification
+
+---
+
+## 🚧 Pending Improvements
+
+- PDF ingestion support
+- Improved response accuracy
+- Multi-language chatbot support
+- Advanced analytics dashboard
+- Role-based access control enhancements
+
+---
+
+## 🎓 Course Context
+
+This project was developed as part of a Software Engineering course to demonstrate:
+- Full-stack development
+- System design and architecture
+- Agile workflow (Git branches)
+- Testing and deployment strategies
+
+---
+
+## 👨‍💻 Author
+
+Team: Byte Squad
+- Ashmit Nirwan
+- Jordan Spector
+- Milton Mupfumira
+- Gio Mendoza  
+
+University of Hartford
