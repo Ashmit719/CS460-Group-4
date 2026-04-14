@@ -445,9 +445,9 @@ function saveBotFromStepTwo() {
         knowledgeText
     };
 
-    const endpoint = isEditMode
-        ? `http://localhost:8080/api/bot/update/${currentBotId}`
-        : 'http://localhost:8080/api/bot/create';
+	const endpoint = isEditMode
+	    ? `/api/bot/update/${currentBotId}`
+	    : '/api/bot/create';
 
     const method = isEditMode ? 'PUT' : 'POST';
 
@@ -634,14 +634,14 @@ function setupChat() {
         let payload = {};
 
         if (currentBotId) {
-            endpoint = 'http://localhost:8080/api/bot/chat';
+            endpoint = '/api/bot/chat';
             payload = {
                 userId: String(user.id),
                 botId: String(currentBotId),
                 message
             };
         } else {
-            endpoint = 'http://localhost:8080/api/bot/previewChat';
+            endpoint = '/api/bot/previewChat';
             payload = {
                 message,
                 knowledgeText: sourceType === 'text' ? previewText : '',
@@ -809,7 +809,7 @@ async function publishCurrentBot() {
     }
 
     try {
-        const res = await fetch(`http://localhost:8080/api/bot/publish/${currentBotId}?userId=${user.id}`, {
+        const res = await fetch(`/api/bot/publish/${currentBotId}?userId=${user.id}`, {
             method: 'POST'
         });
 

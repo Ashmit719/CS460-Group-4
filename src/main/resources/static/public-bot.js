@@ -76,7 +76,7 @@ async function loadBot() {
     }
 
     try {
-        const res = await fetch(`http://localhost:8080/api/bot/public/${token}`);
+        const res = await fetch(`/api/bot/public/${token}`);
 
         if (!res.ok) {
             addBotMessage('This bot is not available.');
@@ -128,7 +128,7 @@ async function sendMessage() {
     }
 
     try {
-        const res = await fetch(`http://localhost:8080/api/bot/publicChat`, {
+        const res = await fetch(`/api/bot/publicChat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

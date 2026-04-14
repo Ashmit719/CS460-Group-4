@@ -187,6 +187,13 @@ function renderActivityTable(rows) {
     `).join('');
 }
 
+function formatLocalDateKey(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 function buildDailySeries(recentActivity) {
     const days = [];
     const counts = [];
@@ -197,7 +204,7 @@ function buildDailySeries(recentActivity) {
         date.setHours(0, 0, 0, 0);
         date.setDate(date.getDate() - i);
 
-        const key = date.toISOString().slice(0, 10);
+        const key = formatLocalDateKey(date);
         days.push({
             key,
             label: formatDayLabel(date)
@@ -211,7 +218,7 @@ function buildDailySeries(recentActivity) {
         }
 
         const date = new Date(item.lastMessageAt);
-        const key = date.toISOString().slice(0, 10);
+        const key = formatLocalDateKey(date);
 
         if (dayMap.has(key)) {
             dayMap.set(key, dayMap.get(key) + 1);
@@ -325,9 +332,9 @@ async function loadAnalytics() {
 
     setPageHeader(user);
 
-    const endpoint = user.role === 'ADMIN'
-        ? 'http://localhost:8080/api/analytics/admin'
-        : `http://localhost:8080/api/analytics/user/${user.id}`;
+	const endpoint = user.role === 'ADMIN'
+	    ? '/api/analytics/admin'
+	    : `/api/analytics/user/${user.id}`;
 
     const res = await fetch(endpoint);
 

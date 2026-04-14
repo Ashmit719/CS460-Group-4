@@ -102,7 +102,7 @@ async function saveProfile() {
     clearMessage('profile-message');
 
     try {
-        const res = await fetch('http://localhost:8080/api/auth/update-profile', {
+        const res = await fetch('/api/auth/update-profile', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -152,7 +152,7 @@ async function changePassword() {
     clearMessage('password-message');
 
     try {
-        const res = await fetch('http://localhost:8080/api/auth/change-password', {
+        const res = await fetch('/api/auth/change-password', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -208,7 +208,7 @@ async function adminResetUserPassword() {
     clearMessage('admin-reset-message');
 
     try {
-        const res = await fetch('http://localhost:8080/api/auth/admin/reset-user-password', {
+        const res = await fetch('/api/auth/admin/reset-user-password', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -138,7 +138,7 @@ async function fetchBotsForCurrentUser() {
         return [];
     }
 
-    const res = await fetch(`http://localhost:8080/api/bot/user/${user.id}`);
+    const res = await fetch(`/api/bot/user/${user.id}`);
 
     if (!res.ok) {
         const text = await res.text();
@@ -169,11 +169,11 @@ async function publishBot(botId) {
     }
 
     try {
-        const res = await fetch(
-            `http://localhost:8080/api/bot/publish/${botId}?userId=${user.id}`,
-            { method: 'POST' }
-        );
-
+		const res = await fetch(
+		    `/api/bot/publish/${botId}?userId=${user.id}`,
+		    { method: 'POST' }
+		);
+		
         if (!res.ok) {
             const text = await res.text();
             throw new Error(text || 'Failed to publish bot');
