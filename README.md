@@ -222,6 +222,7 @@ OPENAI_API_KEY=your_key_here
 ## 🚧 Pending Improvements
 
 - PDF ingestion support
+- Chat Interface on the Landing Page
 - Improved response accuracy
 - Multi-language chatbot support
 - Advanced analytics dashboard
