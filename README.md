@@ -130,13 +130,14 @@ In simple terms:
 ---
 
 ## 🔄 How It Works
+```
 User inputs text
 → Text is cleaned and tokenized
 → Model learns patterns from tokens
 → User enters a prompt
 → Model predicts next tokens repeatedly
 → Chatbot generates output
-
+```
 ---
 
 ## ⚙️ Key Features
