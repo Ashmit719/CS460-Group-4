@@ -242,10 +242,7 @@ This project was developed as part of a Software Engineering course to demonstra
 
 ## 👨‍💻 Author
 
-Team: Byte Squad
+Team:  
 - Ashmit Nirwan
-- Jordan Spector
-- Milton Mupfumira
-- Gio Mendoza  
 
 University of Hartford
