@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chatbot Builder — Tiny Transformer Lab</title>
+  <meta name="description" content="Build a chatbot from your own text using a browser-based transformer model. Train, test, and explore live." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#e7e3da; --panel:#f3f0e8; --panel2:#f7f4ec; --muted:#d9d4ca; --muted2:#cfc8bb;
+      --ink:#161616; --blue:#5ab2ff; --cream:#ebe6db; --white:#fdfbf5; --black:#111;
+    }
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}
+    .wrap{max-width:1600px;margin:0 auto;padding:16px 18px}
+    .shell{border:1px solid #000;background:var(--panel);box-shadow:10px 10px 0 #000;overflow:hidden}
+    .header{border-bottom:1px solid #000;background:var(--muted);display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding:18px 20px;flex-wrap:wrap}
+    .brand{display:flex;gap:16px;align-items:flex-start}
+    .logo{width:48px;height:48px;border:1px solid #000;background:var(--black);color:var(--blue);display:grid;place-items:center;font:700 14px ui-monospace,SFMono-Regular,Menlo,monospace}
+    .eyebrow{font:700 12px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.18em;color:#000a}
+    h1{margin:6px 0 0;font-size:46px;line-height:1;font-weight:900;letter-spacing:-.04em;text-transform:uppercase}
+    .sub{margin-top:8px;max-width:900px;font-size:15px;line-height:1.7;color:#000b}
+    .btns{display:flex;gap:8px;flex-wrap:wrap}
+    button{cursor:pointer;border:1px solid #000;background:var(--panel);padding:11px 16px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+    .btn-blue{background:var(--blue)}
+    .layout{display:grid;grid-template-columns:1fr auto}
+    .main{background:var(--panel2);border-right:1px solid #000}
+    .top-tabs{border-bottom:1px solid #000;background:var(--muted2);padding:12px 20px;display:flex;gap:8px;flex-wrap:wrap}
+    .tab-active{background:var(--black);color:#fff}
+    .content{padding:20px}
+    .hero-row{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-bottom:18px}
+    .hero-row h2{margin:6px 0 0;font-size:42px;line-height:1.02;font-weight:900;letter-spacing:-.04em;text-transform:uppercase}
+    .hero-row p{max-width:900px;font-size:15px;line-height:1.7;color:#000b}
+    .main-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+    .panel{border:1px solid #000;background:var(--cream);padding:12px}
+    .label-row,.mini-row{display:flex;justify-content:space-between;gap:12px;align-items:center}
+    .label{font:700 11px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.14em;color:#0008}
+    textarea,input[type="text"],input[type="number"]{font:14px/1.6 Inter,Arial,sans-serif}
+    textarea{width:100%;resize:vertical;min-height:120px;border:1px solid #000;background:var(--white);padding:12px;outline:none}
+    .dark{border:1px solid #000;background:var(--black);color:#fff;padding:16px}
+    .dark .title{font:700 11px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.14em;color:#fff8}
+    .big-status{margin-top:6px;font-size:30px;font-weight:900;letter-spacing:-.04em;text-transform:uppercase}
+    .badge{border:1px solid var(--blue);padding:5px 8px;color:var(--blue);font-size:11px;font-weight:800;text-transform:uppercase}
+    .stage-box{border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.2);padding:16px}
+    .stage-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+    .stage{position:relative;width:100%;padding:12px 8px;text-align:center;color:#fff;border:1px solid rgba(255,255,255,.2);background:transparent;transition:.18s ease}
+    .stage:hover,.stage:focus-visible{transform:translateY(-2px);outline:none}
+    .stage.active{border-color:var(--blue);background:var(--blue);color:#000;box-shadow:0 0 0 1px var(--blue),0 0 24px rgba(90,178,255,.38);transform:translateY(-4px) scale(1.04)}
+    .stage-num{font:700 10px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.12em;opacity:.7}
+    .stage-title{margin-top:4px;font-size:12px;font-weight:900;text-transform:uppercase}
+    .stage-detail{margin-top:4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;opacity:.75}
+    .tooltip{position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);width:220px;padding:10px 12px;border:1px solid #000;background:var(--panel);color:#000;text-align:left;font-size:11px;line-height:1.5;box-shadow:4px 4px 0 #000;opacity:0;pointer-events:none;transition:opacity .14s ease,transform .14s ease;z-index:8}
+    .stage:hover .tooltip,.stage:focus-visible .tooltip{opacity:1;transform:translateX(-50%) translateY(0)}
+    .progress{margin-top:16px;height:8px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.3);overflow:hidden}
+    .bar{height:100%;width:0;background:var(--blue);transition:width .28s ease}
+    .helper{margin-top:12px;font-size:14px;line-height:1.6;color:#ffffffb8}
+    .stack{display:grid;gap:16px}
+    .insight-card{border:1px solid #000;background:linear-gradient(135deg,#0f1117 0%,#171c29 100%);color:#fff;padding:16px;box-shadow:8px 8px 0 rgba(0,0,0,.18)}
+    .insight-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;flex-wrap:wrap}
+    .insight-copy{max-width:560px}
+    .insight-copy .title{font:700 11px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.16em;color:#9ab6d8}
+    .insight-copy h3{margin:8px 0 0;font-size:32px;line-height:1;font-weight:900;letter-spacing:-.04em;text-transform:uppercase}
+    .insight-copy p{margin:8px 0 0;font-size:14px;line-height:1.6;color:#d8dfec}
+    .learn-side{display:grid;justify-items:end;gap:6px;min-width:180px}
+    .learn-stage{font:700 11px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.16em;color:#9ab6d8}
+    .learn-pct{font-size:46px;line-height:.92;font-weight:900;letter-spacing:-.05em;color:#8cc4ff}
+    .learn-track{position:relative;margin-top:16px;height:20px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);overflow:hidden}
+    .learn-gauge{width:0%;height:100%;background:linear-gradient(90deg,#4d8fff 0%,#74c7ff 45%,#b6f5ff 100%);box-shadow:0 0 28px rgba(116,199,255,.45);transition:width .3s ease,filter .2s ease}
+    .learn-gauge.pulse{filter:brightness(1.18)}
+    .learn-grid{margin-top:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .learn-pill{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);padding:10px 12px}
+    .learn-pill span{display:block;font:700 10px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.16em;color:#9ab6d8}
+    .learn-pill strong{display:block;margin-top:6px;font-size:17px;line-height:1.25;color:#fff}
+    .gen-controls{margin-top:14px;display:grid;gap:10px}
+    .gen-controls-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+    .token-chip{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);padding:7px 10px;font:800 11px/1 ui-monospace,monospace;text-transform:uppercase;letter-spacing:.12em;color:#8cc4ff}
+    .range-wrap{display:grid;gap:8px}
+    .range-wrap input[type="range"]{width:100%;appearance:none;height:12px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(90deg,rgba(77,143,255,.28) 0%,rgba(255,255,255,.06) 100%);outline:none}
+    .range-wrap input[type="range"]::-webkit-slider-thumb{appearance:none;width:22px;height:22px;border-radius:50%;border:1px solid #000;background:#8cc4ff;box-shadow:0 0 0 3px rgba(140,196,255,.18)}
+    .range-wrap input[type="range"]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;border:1px solid #000;background:#8cc4ff;box-shadow:0 0 0 3px rgba(140,196,255,.18)}
+    .range-meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:700 10px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.14em;color:#9ab6d8}
+    .advanced{width:0;opacity:0;overflow:hidden;background:#ece6db;transition:width .28s cubic-bezier(.2,.9,.2,1),opacity .18s ease,transform .28s cubic-bezier(.2,.9,.2,1);transform:translateX(28px)}
+    .advanced.open{width:clamp(380px,30vw,440px);opacity:1;transform:translateX(0)}
+    .advanced-inner{width:clamp(380px,30vw,440px);min-width:0}
+    .adv-head{border-bottom:1px solid #000;background:var(--muted);padding:14px 16px}
+    .adv-head h3{margin:6px 0 0;font-size:36px;text-transform:uppercase;letter-spacing:-.04em;font-weight:900}
+    .adv-head p{margin:6px 0 0;font-size:14px;line-height:1.6;color:#000b}
+    .adv-body{padding:16px;display:grid;gap:16px}
+    .adv-card{border:1px solid #000;background:var(--white)}
+    .adv-card-head{border-bottom:1px solid #000;background:var(--panel);padding:12px 14px;font:700 11px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.16em;color:#0009}
+    .adv-card-body{padding:14px;display:grid;gap:12px}
+    .field-label{margin-bottom:4px;font:700 11px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.14em;color:#0008}
+    .field input{width:100%;border:1px solid #000;background:#fff;padding:11px 12px;outline:none}
+    .workflow-mini{border:1px solid #000;background:var(--black);color:#fff;padding:16px;box-shadow:6px 6px 0 rgba(0,0,0,.22)}
+    .workflow-line{margin-top:12px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;align-items:stretch;text-align:center}
+    .workflow-step,.workflow-step-lit{min-width:0;padding:12px 8px;border:1px solid rgba(255,255,255,.2);font-size:11px;font-weight:900;text-transform:uppercase}
+    .workflow-step-lit{border-color:var(--blue);background:var(--blue);color:#000}
+    .workflow-step div:last-child,.workflow-step-lit div:last-child{overflow-wrap:anywhere}
+    .workflow-arrow{display:none;color:rgba(255,255,255,.6);font-size:22px;font-weight:900}
+    .workflow-meta{margin-top:14px;display:grid;gap:8px;font-size:13px}
+    .workflow-meta div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;border:1px solid rgba(255,255,255,.2);padding:9px 10px}
+    .workflow-meta span,.workflow-meta strong{min-width:0;overflow-wrap:anywhere}
+
+    /* ---- stats row in main ---- */
+    .stats-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .stat-pill{border:1px solid rgba(255,255,255,.2);padding:6px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#ffffffc0}
+    .stat-pill strong{color:var(--blue);margin-left:4px}
+
+    /* ---- training controls row ---- */
+    .train-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .train-controls button{font-size:12px;padding:8px 14px}
+
+    /* ---- boot warning ---- */
+    .boot-warning{background:#ff9800;color:#000;padding:14px 20px;font-size:14px;font-weight:600;display:none}
+
+    @media (max-width:1200px){.main-grid{grid-template-columns:1fr}}
+    @media (max-width:900px){
+      h1{font-size:34px}.hero-row h2{font-size:32px}.layout{grid-template-columns:1fr}.main{border-right:0}
+      .advanced,.advanced.open{width:100%;min-width:0}.advanced-inner{min-width:0}.stage-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .workflow-line{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .learn-grid{grid-template-columns:1fr}
+      .learn-side{justify-items:start}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="shell">
+      <div class="header">
+        <div class="brand">
+          <div class="logo">BOT/</div>
+          <div>
+            <div class="eyebrow">Tiny transformer lab</div>
+            <h1>Time for you to understand ChatGPT, not just use it</h1>
+            <div class="sub">Build a chatbot from your own text, test it live, and open the model lab when you want to see what is really going on behind the scenes.</div>
+          </div>
+        </div>
+        <div class="btns">
+          <button type="button" id="btnSaveSnapshot">Save Snapshot</button>
+          <button type="button" id="btnExport">Export Model</button>
+          <button type="button" id="btnImport">Import Model</button>
+          <input id="fileImport" type="file" accept="application/json" style="display:none;" />
+          <button type="button" id="openLabTop" class="btn-blue">Open Model Lab</button>
+        </div>
+      </div>
+
+      <!-- Boot warning (shown if JS modules fail to load) -->
+      <div id="bootWarning" class="boot-warning" style="display:none;">
+        Scripts did not load. Open this file via a local server (not file://).
+        Example: run <code>npx http-server .</code> in this folder, then open
+        <code>http://localhost:8080/NEWUI.html</code>.
+      </div>
+
+      <div class="layout">
+        <main class="main">
+          <div class="top-tabs">
+            <button type="button" class="tab-active">Main Mode</button>
+            <button type="button" id="toggleAdvanced">Advanced</button>
+          </div>
+
+          <div class="content">
+            <!-- Status bar -->
+            <div style="margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+              <div id="status" style="font:600 13px/1 ui-monospace,monospace;padding:6px 10px;border:1px solid #000;background:var(--cream);text-transform:uppercase;letter-spacing:.06em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">ready</div>
+              <div id="buildPct" style="font:800 13px/1 ui-monospace,monospace;color:var(--blue)">0%</div>
+            </div>
+
+            <div class="hero-row">
+              <div>
+                <div class="eyebrow">Main mode</div>
+                <h2>Make a chatbot in one screen</h2>
+                <p>Paste your dataset, click build, type a message, and see the chatbot respond. No model jargon unless you open Advanced.</p>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button type="button" id="btnApplyData" class="btn-blue">Build Chatbot</button>
+                <button type="button" id="btnLoadExample">Load Example</button>
+                <button type="button" id="btnReset">Reset</button>
+              </div>
+            </div>
+
+            <div class="main-grid">
+              <!-- LEFT: dataset + message -->
+              <div class="panel">
+                <div class="label-row">
+                  <div class="label">Dataset</div>
+                  <div class="label">Paste text</div>
+                </div>
+                <textarea id="data" rows="18" placeholder="Paste the text you want your chatbot to learn from..."></textarea>
+              </div>
+
+              <!-- RIGHT: pipeline + chat -->
+              <div class="stack">
+                <!-- Dataset pipeline stages -->
+                <div class="dark">
+                  <div class="mini-row">
+                    <div>
+                      <div class="title">Dataset pipeline</div>
+                      <div id="datasetStatus" class="big-status">Waiting for text</div>
+                    </div>
+                    <div id="datasetBadge" class="badge">Idle</div>
+                  </div>
+                  <div class="stage-box">
+                    <div id="datasetStages" class="stage-grid"></div>
+                    <div class="progress"><div id="datasetBar" class="bar"></div></div>
+                  </div>
+                  <div class="helper">This one is for dataset prep only: raw text, cleanup, train and validation split, then ready for the model.</div>
+
+                  <!-- Training controls -->
+                  <div class="train-controls">
+                    <button type="button" id="btnTrain" class="btn-blue">Start Training</button>
+                    <button type="button" id="btnStop" disabled>Stop</button>
+                  </div>
+
+                  <!-- Live stats row -->
+                  <div class="stats-row">
+                    <div class="stat-pill">step: <strong id="step">0</strong></div>
+                    <div class="stat-pill">train loss: <strong id="loss">-</strong></div>
+                    <div class="stat-pill">val loss: <strong id="valLoss">-</strong></div>
+                    <div class="stat-pill">vocab: <strong id="vocab">-</strong></div>
+                    <div class="stat-pill">train: <strong id="trainChars">-</strong></div>
+                    <div class="stat-pill">val: <strong id="valChars">-</strong></div>
+                  </div>
+                </div>
+
+                <div class="insight-card">
+                  <div class="insight-top">
+                    <div class="insight-copy">
+                      <div class="title">Learning signal</div>
+                      <h3>Model progress</h3>
+                      <p id="learnExplain">Train a little and this bar starts reflecting how much structure the model is picking up from the dataset.</p>
+                    </div>
+                    <div class="learn-side">
+                      <div id="learnStage" class="learn-stage">Stage: -</div>
+                      <div id="learnPct" class="learn-pct">0%</div>
+                    </div>
+                  </div>
+                  <div class="learn-track" aria-hidden="true">
+                    <div id="learnGauge" class="learn-gauge"></div>
+                  </div>
+                  <div class="learn-grid">
+                    <div class="learn-pill">
+                      <span>Perplexity</span>
+                      <strong id="ppl">-</strong>
+                    </div>
+                    <div class="learn-pill">
+                      <span>Loss stage</span>
+                      <strong id="lossStage">Stage: -</strong>
+                    </div>
+                    <div class="learn-pill">
+                      <span>Build state</span>
+                      <strong id="learnBuildState">Dataset ready</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Message input + transformer pipeline -->
+                <div class="panel">
+                  <div class="label">Message input</div>
+                  <textarea id="prompt" rows="5" placeholder="Ask your chatbot something..."></textarea>
+
+                  <div class="dark" style="margin-top:16px">
+                    <div class="mini-row">
+                      <div>
+                        <div class="title">Transformer pass</div>
+                        <div id="transformerStatus" class="big-status" style="font-size:20px">Waiting for prompt</div>
+                      </div>
+                      <div id="transformerBadge" class="badge">Idle</div>
+                    </div>
+                    <div class="stage-box">
+                      <div id="transformerStages" class="stage-grid"></div>
+                      <div class="progress"><div id="transformerBar" class="bar"></div></div>
+                    </div>
+                    <div class="helper">This one shows the Transformer-style generation flow: read the prompt, embed it, attend to context, then predict the next token.</div>
+                  </div>
+                </div>
+
+                <!-- Chatbot output -->
+                <div class="dark">
+                  <div class="mini-row">
+                    <div class="title">Chatbot output</div>
+                    <button type="button" id="btnGen" style="background:transparent;color:var(--blue);border-color:var(--blue);padding:6px 10px">Generate</button>
+                  </div>
+                  <div class="gen-controls">
+                    <div class="gen-controls-head">
+                      <div class="title">Output length</div>
+                      <div id="maxNewValue" class="token-chip">220 TOKENS</div>
+                    </div>
+                    <div class="range-wrap">
+                      <input id="maxNew" type="range" min="20" max="500" step="10" value="220" />
+                      <div class="range-meta">
+                        <span>Short reply</span>
+                        <span>Long reply</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="output" style="min-height:180px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.2);padding:12px;font-size:14px;line-height:1.8;color:#ffffffe0;margin-top:8px;white-space:pre-wrap;word-break:break-word">
+                    The chatbot's response will appear here after you build from your dataset and generate.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <!-- Advanced panel (slides in) -->
+        <aside id="advanced" class="advanced">
+          <div class="advanced-inner">
+            <div class="adv-head">
+              <div class="eyebrow">Advanced</div>
+              <h3>Model lab</h3>
+              <p>This is where the real training flow, process details, and all the technical controls live.</p>
+            </div>
+
+            <div class="adv-body">
+              <div class="workflow-mini">
+                <div class="title">Technical workflow (GPT-style)</div>
+                <div class="workflow-line">
+                  <div class="workflow-step-lit"><div>01</div><div>Pre-train text</div></div>
+                  <div class="workflow-arrow">→</div>
+                  <div class="workflow-step"><div>02</div><div>Tokenize</div></div>
+                  <div class="workflow-arrow">→</div>
+                  <div class="workflow-step"><div>03</div><div>Transformer</div></div>
+                  <div class="workflow-arrow">→</div>
+                  <div class="workflow-step"><div>04</div><div>Next token</div></div>
+                </div>
+                <div class="workflow-meta">
+                  <div><span>Architecture</span><strong style="color:var(--blue)">Transformer</strong></div>
+                  <div><span>Training idea</span><strong>Language modeling</strong></div>
+                  <div><span>Prediction</span><strong>Next token</strong></div>
+                </div>
+              </div>
+
+              <div class="adv-card">
+                <div class="adv-card-head">Training</div>
+                <div class="adv-card-body">
+                  <label class="field"><div class="field-label">Learning rate</div><input id="lr" type="number" step="0.0001" value="0.005" /></label>
+                  <label class="field"><div class="field-label">Block size</div><input id="blockSize" type="number" step="8" value="192" /></label>
+                  <label class="field"><div class="field-label">d_model</div><input id="dModel" type="number" step="8" value="112" /></label>
+                  <label class="field"><div class="field-label">Steps per tick</div><input id="stepsPerTick" type="number" step="1" value="2500" /></label>
+                  <label class="field"><div class="field-label">Budget ms</div><input id="budgetMs" type="number" step="1" value="35" /></label>
+                </div>
+              </div>
+
+              <div class="adv-card">
+                <div class="adv-card-head">Sampling</div>
+                <div class="adv-card-body">
+                  <label class="field"><div class="field-label">Temperature</div><input id="temp" type="number" step="0.05" value="0.40" /></label>
+                  <label class="field"><div class="field-label">Top-k</div><input id="topK" type="number" step="1" value="50" /></label>
+                  <label class="field"><div class="field-label">Top-p</div><input id="topP" type="number" step="0.01" value="0.95" /></label>
+                  <label class="field"><div class="field-label">Repetition penalty</div><input id="repPenalty" type="number" step="0.05" value="0.20" /></label>
+                  <label class="field"><div class="field-label">No-repeat n-gram</div><input id="noRepeatNgram" type="number" step="1" value="4" /></label>
+                </div>
+              </div>
+
+              <div class="adv-card">
+                <div class="adv-card-head">Data</div>
+                <div class="adv-card-body">
+                  <label class="field"><div class="field-label">Validation split</div><input id="valSplit" type="number" step="1" value="10" /></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app-newui.js"></script>
+  <script>
+    setTimeout(() => {
+      if (!window.__appReady) {
+        const warn = document.getElementById("bootWarning");
+        if (warn) warn.style.display = "block";
+      }
+    }, 600);
+  </script>
+</body>
+</html>

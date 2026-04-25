@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tiny Transformer Lab - Live Train and Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-advanced="true">
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Tiny Transformer Lab</h1>
+        <p>Train a tiny model on your own text and watch learning happen in real time.</p>
+      </div>
+      <div class="top-actions">
+        <label class="toggle">
+          <input id="toggleAdvanced" type="checkbox" checked />
+          Show advanced
+        </label>
+        <div id="status" class="status">ready</div>
+      </div>
+    </header>
+    <div id="bootWarning" class="boot-warning" style="display:none;">
+      Scripts did not load. Open this file using a local server (not file://).
+      Example: run <span class="mono">python -m http.server</span> in this folder, then open
+      <span class="mono">http://localhost:8000/chatbot.html</span>.
+    </div>
+
+    <main class="grid">
+      <section class="panel" aria-label="Dataset and training">
+        <h2>Dataset and Training</h2>
+
+        <div class="stack">
+          <div>
+            <label for="data">Dataset (plain text)</label>
+            <textarea id="data" class="mono"></textarea>
+          </div>
+          <div class="row">
+            <button id="btnApplyData" class="btn-primary">Apply data</button>
+            <button id="btnLoadExample">Load example</button>
+            <button id="btnReset" class="btn-ghost">Reset weights</button>
+          </div>
+          <label class="toggle">
+            <input id="normalize" type="checkbox" checked />
+            Normalize dataset (recommended)
+          </label>
+          <div id="dataRating" class="note mono">Paste text, then click Apply data.</div>
+        </div>
+
+        <div class="stack">
+          <div class="section-title">Tokenizer</div>
+          <div class="row">
+            <div>
+              <label for="tokMode">Tokenizer mode</label>
+              <select id="tokMode">
+                <option value="char" selected>Character-level (fastest)</option>
+                <option value="bpe">Token-level BPE</option>
+              </select>
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button id="btnTokInfo">About token mode</button>
+            </div>
+          </div>
+
+          <details class="details advanced">
+            <summary>Token-level BPE settings</summary>
+            <div class="row" style="margin-top:10px;">
+              <div>
+                <label for="bpeVocab">Target vocab size</label>
+                <input id="bpeVocab" type="number" step="50" value="2000" />
+              </div>
+              <div>
+                <label for="bpeSampleChars">Sample chars</label>
+                <input id="bpeSampleChars" type="number" step="10000" value="1000000" />
+              </div>
+              <div>
+                <label for="bpeMaxWords">Max unique words</label>
+                <input id="bpeMaxWords" type="number" step="1000" value="40000" />
+              </div>
+            </div>
+            <div class="small" style="margin-top:8px;">
+              BPE gives cleaner words but Apply data will take longer while it builds the tokenizer.
+            </div>
+          </details>
+        </div>
+
+        <div class="stack">
+          <div class="section-title">Presets</div>
+          <div>
+            <label>Dataset type</label>
+            <div id="trainPresetChips" class="tags">
+              <button class="chip" data-preset="auto">Auto</button>
+              <button class="chip" data-preset="chat">Chat</button>
+              <button class="chip" data-preset="dialogue">Dialogue</button>
+              <button class="chip" data-preset="prose">Prose</button>
+              <button class="chip" data-preset="code">Code</button>
+              <button class="chip" data-preset="math">Math</button>
+              <button class="chip" data-preset="lyrics">Lyrics</button>
+              <button class="chip" data-preset="mixed">Mixed</button>
+            </div>
+            <select id="presetTrain" class="advanced" hidden>
+              <option value="auto" selected>Auto (from dataset)</option>
+              <option value="chat">Chat</option>
+              <option value="dialogue">Dialogue</option>
+              <option value="prose">Prose</option>
+              <option value="code">Code</option>
+              <option value="math">Math</option>
+              <option value="lyrics">Lyrics</option>
+              <option value="mixed">Mixed</option>
+            </select>
+          </div>
+          <div>
+            <label>Speed target</label>
+            <div id="speedPresetChips" class="tags">
+              <button class="chip" data-speed="slow">Slow</button>
+              <button class="chip active" data-speed="average">Average</button>
+              <button class="chip" data-speed="fast">Fast</button>
+            </div>
+            <select id="speedPreset" class="advanced" hidden>
+              <option value="slow">Slow</option>
+              <option value="average" selected>Average</option>
+              <option value="fast">Fast</option>
+            </select>
+          </div>
+          <div id="presetInfo" class="small">recommended: -</div>
+          <div id="presetDiff" class="note">Preset changes will appear here.</div>
+        </div>
+
+        <div class="stack">
+          <div class="section-title">Training controls</div>
+          <div class="row">
+            <button id="btnTrain" class="btn-primary">Start training</button>
+            <button id="btnStop" disabled>Stop</button>
+            <button id="btnExport">Export model</button>
+            <button id="btnImport">Import model</button>
+            <input id="fileImport" type="file" accept="application/json" style="display:none;" />
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="section-title">Core knobs</div>
+          <div class="row">
+            <div>
+              <label for="lr">Learning rate</label>
+              <input id="lr" type="number" step="0.0001" value="0.006" />
+            </div>
+            <div>
+              <label for="blockSize">Block size</label>
+              <input id="blockSize" type="number" step="8" value="160" />
+            </div>
+            <div>
+              <label for="dModel">Model width (d_model)</label>
+              <input id="dModel" type="number" step="8" value="96" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="stepsPerTick">Steps per tick</label>
+              <input id="stepsPerTick" type="number" step="1" value="2500" />
+            </div>
+            <div>
+              <label for="budgetMs">Compute budget (ms)</label>
+              <input id="budgetMs" type="number" step="1" value="35" />
+            </div>
+            <div>
+              <label for="uiEvery">UI update (ticks)</label>
+              <input id="uiEvery" type="number" step="1" value="12" />
+            </div>
+          </div>
+        </div>
+
+        <details class="details advanced">
+          <summary>Advanced training</summary>
+          <div class="row" style="margin-top:10px;">
+            <div>
+              <label for="optim">Optimizer</label>
+              <select id="optim">
+                <option value="adam" selected>Adam</option>
+                <option value="sgd">SGD</option>
+              </select>
+            </div>
+            <div>
+              <label for="decay">LR decay</label>
+              <input id="decay" type="number" step="0.000001" value="0.000003" />
+            </div>
+            <div>
+              <label for="warmup">Warmup steps</label>
+              <input id="warmup" type="number" step="1" value="400" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="wd">Weight decay</label>
+              <input id="wd" type="number" step="0.0001" value="0.0007" />
+            </div>
+            <div>
+              <label for="labelSmooth">Label smoothing</label>
+              <input id="labelSmooth" type="number" step="0.01" value="0.04" />
+            </div>
+            <div>
+              <label for="clip">Grad clip</label>
+              <input id="clip" type="number" step="0.1" value="1" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="valSplit">Validation split (%)</label>
+              <input id="valSplit" type="number" step="1" value="10" />
+            </div>
+            <div>
+              <label for="evalEvery">Eval every (ticks)</label>
+              <input id="evalEvery" type="number" step="1" value="30" />
+            </div>
+            <div>
+              <label for="maxBlock">Max block supported</label>
+              <input id="maxBlock" type="number" value="256" disabled />
+            </div>
+          </div>
+
+          <div class="row">
+            <label class="toggle">
+              <input id="tieWeights" type="checkbox" checked />
+              Tie weights
+            </label>
+            <label class="toggle">
+              <input id="residual" type="checkbox" checked />
+              Residual connection
+            </label>
+          </div>
+        </details>
+
+        <details class="details advanced">
+          <summary>What the knobs do</summary>
+          <ul class="notes">
+            <li><strong>Learning rate</strong>: how fast weights move; too high can make loss explode.</li>
+            <li><strong>Warmup + decay</strong>: eases into training and slowly lowers LR for stability.</li>
+            <li><strong>Weight decay</strong>: gently shrinks weights to reduce overfitting.</li>
+            <li><strong>Label smoothing</strong>: softens targets so the model does not lock in too hard.</li>
+            <li><strong>Block size</strong>: context length; bigger means more memory and slower steps.</li>
+            <li><strong>Top-K/Top-P/Temp</strong>: generation-only knobs, they do not change training.</li>
+          </ul>
+        </details>
+      </section>
+
+      <section class="panel" aria-label="Chat and generation">
+        <h2>Chat and Generate</h2>
+        <div class="stack">
+          <div>
+            <label for="prompt">Prompt</label>
+            <textarea id="prompt" class="mono"></textarea>
+          </div>
+          <div class="row">
+            <button id="btnGen" class="btn-primary">Generate</button>
+            <label class="toggle">
+              <input id="live" type="checkbox" />
+              Auto refresh
+            </label>
+            <input id="liveMs" type="number" value="1200" step="100" />
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="section-title">Output presets</div>
+          <div id="genPresetChips" class="tags">
+            <button class="chip" data-preset="auto">Auto</button>
+            <button class="chip" data-preset="chat">Chat</button>
+            <button class="chip" data-preset="dialogue">Dialogue</button>
+            <button class="chip" data-preset="prose">Prose</button>
+            <button class="chip" data-preset="code">Code</button>
+            <button class="chip" data-preset="math">Math</button>
+            <button class="chip" data-preset="lyrics">Lyrics</button>
+            <button class="chip" data-preset="mixed">Mixed</button>
+          </div>
+          <select id="preset" class="advanced" hidden>
+            <option value="auto" selected>Auto (from dataset)</option>
+            <option value="chat">Chat</option>
+            <option value="dialogue">Dialogue</option>
+            <option value="prose">Prose</option>
+            <option value="code">Code</option>
+            <option value="math">Math</option>
+            <option value="lyrics">Lyrics</option>
+            <option value="mixed">Mixed</option>
+          </select>
+          <button id="btnPreset" class="advanced" hidden>Apply preset</button>
+        </div>
+
+        <div class="stack">
+          <div class="section-title">Generation controls</div>
+          <div class="row">
+            <div>
+              <label for="maxNew">Max new tokens</label>
+              <input id="maxNew" type="number" step="10" value="200" />
+            </div>
+            <div>
+              <label for="temp">Temperature</label>
+              <input id="temp" type="number" step="0.05" value="0.35" />
+            </div>
+            <div>
+              <label for="topK">Top-K</label>
+              <input id="topK" type="number" step="1" value="60" />
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label for="topP">Top-P</label>
+              <input id="topP" type="number" step="0.01" value="0.95" />
+            </div>
+            <div>
+              <label for="repPenalty">Repetition penalty</label>
+              <input id="repPenalty" type="number" step="0.05" value="0.2" />
+            </div>
+            <div>
+              <label for="noRepeatNgram">No-repeat n-gram</label>
+              <input id="noRepeatNgram" type="number" step="1" value="4" />
+            </div>
+          </div>
+          <div class="row">
+            <label class="toggle">
+              <input id="normPrompt" type="checkbox" checked />
+              Normalize prompt
+            </label>
+            <label class="toggle">
+              <input id="greedy" type="checkbox" />
+              Greedy
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-title">Output</div>
+          <div id="output" class="out mono"></div>
+          <div class="small" style="margin-top:8px;">Confidence (softmax peak)</div>
+          <div class="heatbar"><span id="confMeter"></span></div>
+          <div id="confExplain" class="small">confidence = average softmax peak while generating</div>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="Learning dashboard">
+        <h2>Learning Dashboard</h2>
+
+        <div class="stack" id="learningPulse">
+          <div class="section-title">Generalization gauge</div>
+          <div class="gauge" id="learnGauge">
+            <div class="gauge-center">
+              <div id="learnPct" class="gauge-value">0%</div>
+              <div id="learnStage" class="gauge-label">stage: -</div>
+              <div id="learnExplain" class="small">quality ~= 1 - loss / ln(vocab)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="section-title">Dataset gobble meter</div>
+          <div class="meter">
+            <div class="progress"><span id="gobbleMeter"></span></div>
+            <div class="row">
+              <span id="gobblePct" class="pill">0%</span>
+              <span class="pill">epochs: <span id="epochs">0.00</span></span>
+              <span class="pill">plateau: <span id="plateau">-</span></span>
+            </div>
+            <div class="small">ETA to 1 epoch: <span id="epochEta">-</span></div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="section-title">Quality snapshot</div>
+          <div class="cards">
+            <div class="card-stat">
+              <span>Val perplexity</span>
+              <strong id="ppl">-</strong>
+            </div>
+            <div class="card-stat">
+              <span>Repetition rate</span>
+              <strong id="repRate">-</strong>
+            </div>
+            <div class="card-stat">
+              <span>Novelty</span>
+              <strong id="noveltyRate">-</strong>
+            </div>
+            <div class="card-stat">
+              <span>Copying</span>
+              <strong id="copyRate">-</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="section-title">Loss trend</div>
+          <div class="canvas-wrap">
+            <canvas id="lossPlot" width="360" height="160"></canvas>
+            <div class="small" id="lossStage">stage: -</div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="section-title">Checkpoint samples</div>
+          <label class="toggle">
+            <input id="sampleAuto" type="checkbox" />
+            Auto refresh samples on eval
+          </label>
+          <div id="sampleTimeline" class="timeline"></div>
+        </div>
+
+        <details class="details">
+          <summary>Debug snapshot</summary>
+          <div class="row" style="margin-top:10px;">
+            <button id="btnDebug">Capture debug</button>
+            <button id="btnCopyDebug">Copy debug</button>
+          </div>
+          <pre id="debugOut" class="out mono" style="min-height:120px;"></pre>
+        </details>
+
+        <div class="stack">
+          <div class="section-title">Live stats</div>
+          <div class="row">
+            <span class="pill">step: <span id="step">0</span></span>
+            <span class="pill">train loss: <span id="loss">-</span></span>
+            <span class="pill">val loss: <span id="valLoss">-</span></span>
+          </div>
+          <div class="row">
+            <span class="pill">vocab: <span id="vocab">-</span></span>
+            <span class="pill">train tokens: <span id="trainChars">-</span></span>
+            <span class="pill">val tokens: <span id="valChars">-</span></span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="app.js"></script>
+  <script>
+    setTimeout(() => {
+      if (!window.__appReady) {
+        const warn = document.getElementById("bootWarning");
+        if (warn) warn.style.display = "block";
+      }
+    }, 600);
+  </script>
+</body>
+</html>
