@@ -171,7 +171,7 @@ This project is designed as an **educational tool** to:
 | AI | OpenAI API | No external AI |
 | Backend | Spring Boot | Client-side |
 | Use Case | Real-world chatbot | Learning tool |
-| Complexity | High | Moderate |
+| Complexity | High | High |
 
 ---
 
