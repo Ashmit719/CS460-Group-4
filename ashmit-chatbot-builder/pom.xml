@@ -12,9 +12,9 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>chatbot</artifactId>
+    <artifactId>ashmit-chatbot-builder</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>chatbot</name>
+    <name>ashmit-chatbot-builder</name>
 
     <properties>
         <java.version>21</java.version>
