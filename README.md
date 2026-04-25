@@ -20,6 +20,7 @@ While contributing to the team project, I continued developing my original AI-po
 ## 📂 Repository Structure
 CS460-Group-4/
 ├── ashmit-chatbot-builder/ # Individual Project (AI-powered chatbot platform)
+
 ├── byte-squad-chatbot-builder/ # Team Project (in-browser chatbot learning system)
 
 ---
